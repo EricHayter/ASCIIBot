@@ -100,65 +100,66 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    elif message.content.startswith('$ascii help'):
-        embedVar = discord.Embed(title="ASCII Bot Help", description="To convert a photo to ASCII symbols use the \"$ascii art\" command in the following format:\n$ascii art <number of coloumns> <style> <source URL>\n\nUse \"$ascii styles\" to discover different character sets", color=0xF0FFFF)
-        await message.channel.send("", embed=embedVar)
-    
-    elif message.content.startswith('$ascii styles'):
-        embedVar = discord.Embed(title="Styles Menu", description="**gscale1:**\n \"`^\",:;Il!i~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao\*#MW&8%B@$\"\n**gscale2:**\n \".:-=+\*#%@\"\n**gscale3:**\n \" ░▒▓\"", color=0xF0FFFF)
-        await message.channel.send("", embed=embedVar)
+    if  message.content.startswith('$ascii'):
+        if message.content.startswith('$ascii help'):
+            embedVar = discord.Embed(title="ASCII Bot Help", description="To convert a photo to ASCII symbols use the \"$ascii art\" command in the following format:\n$ascii art <number of coloumns> <style> <source URL>\n\nUse \"$ascii styles\" to discover different character sets", color=0xF0FFFF)
+            await message.channel.send("", embed=embedVar)
 
-    elif message.content.startswith('$ascii art '):
-        try:
-            #command format: $ascii art colnum style url
-            command = message.content.split()
-            style = gscale3
-            if (command[3] == "gscale1"):
-                style = gscale1
-            elif (command[3] == "gscale2"):
-                style = gscale2
-            elif (command[3] == "gscale3"):
+        elif message.content.startswith('$ascii styles'):
+            embedVar = discord.Embed(title="Styles Menu", description="**gscale1:**\n \"`^\",:;Il!i~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao\*#MW&8%B@$\"\n**gscale2:**\n \".:-=+\*#%@\"\n**gscale3:**\n \" ░▒▓\"", color=0xF0FFFF)
+            await message.channel.send("", embed=embedVar)
+
+        elif message.content.startswith('$ascii art '):
+            try:
+                #command format: $ascii art colnum style url
+                command = message.content.split()
                 style = gscale3
-            elif (command[3] == "rgscale1"):
-                style = rgscale1
-            elif (command[3] == "rgscale2"):
-                style = rgscale2
-            elif (command[3] == "rgscale3"):
-                style = rgscale3
-            else:
-                embedVar = discord.Embed(title="ERROR: Invalid Style", description="ASCII Bot could not find the character set you were looking for. Try using \"$ascii style\" to find available character sets.",color=0xF0FFFF)
-                await message.channel.send("", embed=embedVar)
-                return
-            
-            # gets the photo from a url and turns it grayscale
-            im = Image.open(requests.get(command[4], stream=True).raw).convert("L")
+                if (command[3] == "gscale1"):
+                    style = gscale1
+                elif (command[3] == "gscale2"):
+                    style = gscale2
+                elif (command[3] == "gscale3"):
+                    style = gscale3
+                elif (command[3] == "rgscale1"):
+                    style = rgscale1
+                elif (command[3] == "rgscale2"):
+                    style = rgscale2
+                elif (command[3] == "rgscale3"):
+                    style = rgscale3
+                else:
+                    embedVar = discord.Embed(title="ERROR: Invalid Style", description="ASCII Bot could not find the character set you were looking for. Try using \"$ascii style\" to find available character sets.",color=0xF0FFFF)
+                    await message.channel.send("", embed=embedVar)
+                    return
 
-            #stores dimensions of picture
-            width, height = im.size[0], im.size[1]
+                # gets the photo from a url and turns it grayscale
+                im = Image.open(requests.get(command[4], stream=True).raw).convert("L")
 
-            #finding aspect ratio
-            imgScale = width/height
+                #stores dimensions of picture
+                width, height = im.size[0], im.size[1]
 
-            #making a list of strings for each row in the art
-            textImg = covertImageToAscii(im,int(command[2]),imgScale,style)
+                #finding aspect ratio
+                imgScale = width/height
 
-            # open file
-            with open("art.txt", 'w',encoding="utf-8") as f:
-                # write to file
-                for row in textImg:
-                    f.write(row + "\n")
+                #making a list of strings for each row in the art
+                textImg = covertImageToAscii(im,int(command[2]),imgScale,style)
 
-            # cleanup
-            f.close()
-            file = discord.File("art.txt", filename="art.txt")
+                # open file
+                with open("art.txt", 'w',encoding="utf-8") as f:
+                    # write to file
+                    for row in textImg:
+                        f.write(row + "\n")
 
-            await message.channel.send(file=file)
-        except:
-            await message.channel.send("Formatting Error: make sure you are following the proper format of the art command. For more information use the \"$ascii help\" command")
-            
-    else: 
-        embedVar = discord.Embed(title="Command ERROR", description="Make sure you are using an ASCII Bot command. For more information on ASCII Bot commands use \"$ascii help\"", color=0xF0FFFF)
-        await message.channel.send("", embed=embedVar)
+                # cleanup
+                f.close()
+                file = discord.File("art.txt", filename="art.txt")
+
+                await message.channel.send(file=file)
+            except:
+                await message.channel.send("Formatting Error: make sure you are following the proper format of the art command. For more information use the \"$ascii help\" command")
+
+        else: 
+            embedVar = discord.Embed(title="Command ERROR", description="Make sure you are using an ASCII Bot command. For more information on ASCII Bot commands use \"$ascii help\"", color=0xF0FFFF)
+            await message.channel.send("", embed=embedVar)
 
 #keeps the bot up 24/7
 keep_alive()
